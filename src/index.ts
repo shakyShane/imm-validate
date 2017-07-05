@@ -194,9 +194,9 @@ export interface ValidationResults {
 
 export interface ValidationError {
     result?: boolean;
-    message: string;
-    type: string;
-    prefixed: string;
+    message?: string;
+    type?: string;
+    prefixed?: string;
 }
 
 export interface Result {
