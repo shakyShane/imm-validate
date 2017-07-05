@@ -3,7 +3,7 @@ import {fromJS, List, Map} from "immutable";
 
 const emptyList = List([]);
 
-export function format(schema: IncomingSchema, options: IncomingOptions, values: IncomingValues): IncomingSchema {
+export function format<T>(schema: IncomingSchema, options: IncomingOptions, values: IncomingValues): T {
     const I_schema  = fromJS(schema);
     const I_options = fromJS(options);
     const I_values  = fromJS(values);
