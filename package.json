@@ -1,0 +1,27 @@
+{
+  "name": "imm-validate",
+  "version": "1.0.3",
+  "description": "",
+  "main": "dist/index.js",
+  "directories": {
+    "test": "test"
+  },
+  "dependencies": {
+    "immutable": "3.8.1"
+  },
+  "devDependencies": {
+    "browserify": "14.4.0",
+    "mocha": "3.4.2",
+    "typescript": "2.4.1"
+  },
+  "scripts": {
+    "test": "mocha"
+  },
+  "files": [
+    "dist"
+  ],
+  "typings": "./dist/index.d.ts",
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}
