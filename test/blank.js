@@ -20,7 +20,7 @@ it('can return a blank data structure', function () {
     }
     const values = {};
     const result = (blank(schema, options, values));
-    console.log(result);
+    // console.log(result);
     equal(result.hasErrors, false);
     equal(result.errors.length, 0);
     equal(result.fields.address.postcode.errors.length, 0);
