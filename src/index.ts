@@ -15,7 +15,7 @@ export function validate(schema: IncomingSchema, options: IncomingOptions, value
     const I_options = fromJS(options);
     const I_values  = fromJS(values);
 
-    const fields = validateFields(I_schema, fromJS({}), []);
+    const fields = getValidator(I_options, I_values, validateItem)(I_schema, fromJS({}), []);
     const errors = flattenErrors(fields);
     const singularErrors = flattenErrors(fields, 1);
 
@@ -25,8 +25,10 @@ export function validate(schema: IncomingSchema, options: IncomingOptions, value
         hasErrors: errors.size > 0,
         singularErrors: singularErrors.toJS()
     };
+}
 
-    function validateFields(input: IMap, initial: IMap, path: string[]): IMap {
+function getValidator(options: IMap, values: IMap, validateRunner: Function) {
+    return function validateFields(input: IMap, initial: IMap, path: string[]): IMap {
         return input.reduce((map: IMap, item, key: string) => {
 
             const lookup = [...path, key];
@@ -35,15 +37,34 @@ export function validate(schema: IncomingSchema, options: IncomingOptions, value
                 return map.set(key, validateFields(item, fromJS({}), lookup.concat('fields')));
             }
 
-            const itemOptions = I_options.getIn(lookup, Map({}));
-            const itemValues = I_values.getIn(lookup.filter(x => x !== 'fields'));
+            const itemOptions = options.getIn(lookup, Map({}));
+            const itemValues = values.getIn(lookup.filter(x => x !== 'fields'));
 
-            return map.set(key, validateItem(item, itemOptions, itemValues, lookup.filter(x => x !== 'fields')));
+            return map.set(key, validateRunner(item, itemOptions, itemValues, lookup.filter(x => x !== 'fields')));
         }, <IMap>initial);
     }
 }
 
-function validateItem(item: MaybeMap, options: IMap, value: any, path: string[]) {
+
+/**
+ * Export an object in the correct shape, but without any validators running
+ */
+export function blank(schema: IncomingSchema, options: IncomingOptions, values: IncomingValues): ValidationResults {
+    const I_schema  = fromJS(schema);
+    const I_options = fromJS(options);
+    const I_values  = fromJS(values);
+
+    const fields = getValidator(I_options, I_values, blankItem)(I_schema, fromJS({}), []);
+
+    return {
+        fields: fields.toJS(),
+        errors: [],
+        hasErrors: false,
+        singularErrors: []
+    };
+}
+
+function validateItem(item: MaybeMap, options: IMap, value: any, path: string[]): IMap {
     const map = Map.isMap(item) ? item : Map({});
     const itemValidators = getValidators(options);
     const errors = collectErrors(itemValidators, options, value, path);
@@ -53,6 +74,13 @@ function validateItem(item: MaybeMap, options: IMap, value: any, path: string[])
         errors,
         hasError: errors.size > 0
     }))
+}
+
+function blankItem(item: MaybeMap, options: IMap, value: any, path: string[]): IMap {
+    const map = Map.isMap(item) ? item : Map({});
+    return map
+        .set('errors', emptyList)
+        .set('hasError', false)
 }
 
 function collectErrors(validators: List<IValidator>, options: IMap, value: any, path: string[]) {
