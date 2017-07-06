@@ -22,6 +22,7 @@ it('validates 1 level', function () {
     assert.equal(result.hasErrors, true);
     assert.equal(result.fields.delivery_date.errors.length, 1);
     assert.equal(result.fields.delivery_date.errors[0].message, 'This is a required field');
+    assert.equal(result.fields.delivery_date.errors[0].prefixed, 'Delivery Date: This is a required field');
     assert.deepEqual(result.errors[0].path, ['delivery_date']);
 });
 it('validates 2 levels', function () {

@@ -89,6 +89,5 @@ it('can apply formatting to an item in a list', function () {
         address: ["ng183lj"]
     };
     const result = (format(schema, options, values));
-    console.log(result);
     equal(result.address[0], 'NG183LJ');
 });

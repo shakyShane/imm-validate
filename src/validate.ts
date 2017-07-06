@@ -110,11 +110,18 @@ function required(options: IMap, value: any, path: string[]) {
     return result;
 }
 
+function getPrefixed(options: IMap, message: string): string {
+    const label = options.get('label');
+
+    return label
+        ? `${label}: ${message}`
+        : message;
+}
+
 function createResult(validator: IValidator, options: IMap, result: ValidatorResult, path: string[]) {
     const message = options.get('error', validator.get('error'));
-    const prefixed = options.get('label')
-        ? `${options.get('label')}: ${message}`
-        : message;
+
+    const prefixed = getPrefixed(options, message);
 
     const defaultResult = fromJS({
         message,
@@ -124,8 +131,17 @@ function createResult(validator: IValidator, options: IMap, result: ValidatorRes
     });
 
     if (isObjectObject(result)) {
-        if (!(result as any).result) {
-            return List([defaultResult.merge(fromJS(result))]);
+        const r : any = result;
+        if (!r.result) {
+            const resultFromObject = fromJS(result)
+                .update(function(I_result: IMap) {
+                    if (r.message && !r.prefixed) {
+                        return I_result.set('prefixed', getPrefixed(options, r.message));
+                    }
+                    return I_result;
+                });
+
+            return List([defaultResult.merge(resultFromObject)]);
         } else {
             return emptyList;
         }
@@ -159,7 +175,7 @@ function isObject(val: any): boolean {
     return val != null && typeof val === 'object' && Array.isArray(val) === false;
 }
 
-export type ValidatorResult = boolean|ValidationError;
+export type ValidatorResult = (boolean | ValidationError);
 
 export interface ValidationResults {
     fields: PlainObject
