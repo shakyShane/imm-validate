@@ -68,3 +68,27 @@ it('can apply formats 2 levels deep', function () {
     const result = (format(schema, options, values));
     equal(result.address.postcode, 'NG183LJ');
 });
+it('can apply formatting to an item in a list', function () {
+    const schema = {
+        address: ["string"]
+    };
+    const options = {
+        address: {
+            fields: [
+                {
+                    formatters: [
+                        function (options, value) {
+                            return value.toUpperCase();
+                        }
+                    ]
+                }
+            ]
+        }
+    };
+    const values = {
+        address: ["ng183lj"]
+    };
+    const result = (format(schema, options, values));
+    console.log(result);
+    equal(result.address[0], 'NG183LJ');
+});
