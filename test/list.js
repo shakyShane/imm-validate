@@ -11,13 +11,21 @@ it('can validate a list', function() {
         address: {
             fields: {
                 street: {
-                    validators: [function(options, value, path) {
-                        const [first, second] = value;
-                        if (!first) {
-                            return false;
+                    fields: [
+                        {
+                            validators: [
+                                function(options, value, path) {
+                                    return {
+                                        result: false,
+                                        message: "The first field is required"
+                                    };
+                                },
+                                function someOther() {
+                                    return false;
+                                }
+                            ]
                         }
-                        return true;
-                    }]
+                    ]
                 }
             },
         }
@@ -25,12 +33,12 @@ it('can validate a list', function() {
 
     const values = {
         address: {
-            street: ["", "Mansfield"]
+            street: [""]
         }
     };
-    const result = (validate(schema, options, values));
 
+    const result = (validate(schema, options, values));
     equal(result.hasErrors, true);
-    equal(result.errors.length, 1);
-    equal(result.fields.address.street.errors.length, 1);
+    equal(result.errors.length, 2);
+    equal(result.singularErrors.length, 1);
 });

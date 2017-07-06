@@ -144,6 +144,9 @@ function flattenErrors(fields: IMap, limit = 10): List<IValidationError> {
             }
             return list.concat(flattenErrors(item, limit).take(limit));
         }
+        if (List.isList(item)) {
+            return list.concat(flattenErrors(item, limit).take(limit));
+        }
         return list;
     }, List<IValidationError>([]));
 }
