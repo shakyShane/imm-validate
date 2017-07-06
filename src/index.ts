@@ -38,4 +38,4 @@ export type IncomingOptions = {[index: string]: IncomingOptions};
 export type IncomingValues = {[index: string]: IncomingValues};
 export type IMap = Map<string, any>;
 export type MaybeMap = IMap|any;
-export type simpleObject = {[index: string]: any}
+export type PlainObject = {[index: string]: any}

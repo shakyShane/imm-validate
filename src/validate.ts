@@ -1,13 +1,9 @@
 import {fromJS, Map, List} from 'immutable';
-import {format} from "./format";
 import {
     getTransformer,
     IMap,
-    IncomingOptions,
-    IncomingSchema,
-    IncomingValues,
     MaybeMap,
-    simpleObject,
+    PlainObject,
 } from "./index";
 
 const emptyList = List([]);
@@ -21,7 +17,7 @@ const defaultValidators = {
     }
 };
 
-export function validate(schema: IncomingSchema, options: IncomingOptions, values: IncomingValues): ValidationResults {
+export function validate(schema: PlainObject, options: PlainObject, values: PlainObject): ValidationResults {
     const I_schema  = fromJS(schema);
     const I_options = fromJS(options);
     const I_values  = fromJS(values);
@@ -41,7 +37,7 @@ export function validate(schema: IncomingSchema, options: IncomingOptions, value
 /**
  * Export an object in the correct shape, but without any validators running
  */
-export function blank(schema: IncomingSchema, options: IncomingOptions, values: IncomingValues): ValidationResults {
+export function blank(schema: PlainObject, options: PlainObject, values: PlainObject): ValidationResults {
     const I_schema  = fromJS(schema);
     const I_options = fromJS(options);
     const I_values  = fromJS(values);
@@ -163,7 +159,7 @@ function isObject(val: any): boolean {
 export type ValidatorResult = boolean|ValidationError;
 
 export interface ValidationResults {
-    fields: simpleObject
+    fields: PlainObject
     errors: ValidationError[]
     hasErrors: boolean
     singularErrors: ValidationError[]
