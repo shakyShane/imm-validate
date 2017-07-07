@@ -5,6 +5,7 @@ it('can validate a list', function() {
     const schema = {
         address: {
             street: ["string"],
+            name: "string"
         }
     };
     const options = {
@@ -26,6 +27,16 @@ it('can validate a list', function() {
                             ]
                         }
                     ]
+                },
+                name: {
+                    validators: [
+                        function name1() {
+                            return false;
+                        },
+                        function name2() {
+                            return false;
+                        },
+                    ]
                 }
             },
         }
@@ -38,7 +49,7 @@ it('can validate a list', function() {
     };
 
     const result = (validate(schema, options, values));
+    equal(result.errors.length, 4);
     equal(result.hasErrors, true);
-    equal(result.errors.length, 2);
-    equal(result.singularErrors.length, 1);
+    equal(result.singularErrors.length, 2);
 });

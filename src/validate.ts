@@ -158,10 +158,10 @@ function flattenErrors(fields: IMap, limit = 10): List<IValidationError> {
             if (item.has('errors')) { // top level if 'errors' key exists
                 return list.concat(item.get('errors').take(limit));
             }
-            return list.concat(flattenErrors(item, limit).take(limit));
+            return list.concat(flattenErrors(item, limit));
         }
         if (List.isList(item)) {
-            return list.concat(flattenErrors(item, limit).take(limit));
+            return list.concat(flattenErrors(item, limit));
         }
         return list;
     }, List<IValidationError>([]));
