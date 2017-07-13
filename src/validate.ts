@@ -189,6 +189,7 @@ export interface ValidationError {
     message?: string;
     type?: string;
     prefixed?: string;
+    path: string[];
 }
 
 export interface Result {
