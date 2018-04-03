@@ -9,31 +9,53 @@ export function getTransformer(options: IMap, values: IMap, transformFn: Functio
 
     return function validateFields(schema: IMap, initial: IMap, path: PathArray): IMap {
 
-        return schema.reduce((map: IMap, item, key: string) => {
+        return schema.reduce((map: IMap, schemaItem, key: string) => {
 
             const lookup = [...path, key];
             const schemaPath = lookup.filter(x => x !== 'fields');
 
-            if (Map.isMap(item)) {
-                return map.set(key, validateFields(item, fromJS({}), lookup.concat('fields')));
+            if (Map.isMap(schemaItem)) {
+                return map.set(key, validateFields(schemaItem, fromJS({}), lookup.concat('fields')));
             }
 
-            if (List.isList(item)) {
+            if (List.isList(schemaItem)) {
 
                 const fields = options.getIn(lookup.concat('fields'), emptyList);
                 const subject = map.set(key, emptyList);
 
                 return fields.reduce((map: IMap, item: any, index: number) => {
-                    const itemOptions = options.getIn(lookup.concat('fields', index), emptyMap);
-                    const itemValues = values.getIn(schemaPath.concat(index));
-                    return map.setIn([key, index], transformFn(item, itemOptions, itemValues, schemaPath.concat(index)));
+                    const schemaValue = schemaItem.get(index);
+                    const isStringField = typeof schemaValue === 'string';
+
+                    /**
+                     * If the schema field was like ["string"],
+                     * just validate the item with the current options/values
+                     */
+                    if (isStringField) {
+                        const itemValues = values.getIn(schemaPath.concat(index));
+                        const itemOptions = options.getIn(lookup.concat('fields', index), emptyMap);
+                        return map.setIn([key, index], transformFn(item, itemOptions, itemValues, schemaPath.concat(index)));
+                    }
+
+                    /**
+                     * If a map was given like [{name: string}],
+                     * then validate item separately
+                     */
+                    if (Map.isMap(item)) {
+                        return map.setIn([key, index], item.map((value: any, key: any) => {
+                            const itemOptions = options.getIn(lookup.concat('fields', index, key), emptyMap);
+                            const itemValues = values.getIn(schemaPath.concat(index, key));
+                            return transformFn(value, itemOptions, itemValues, schemaPath.concat(index, key))
+                        }));
+                    }
+                    return map;
                 }, subject);
             }
 
             const itemOptions = options.getIn(lookup, emptyMap);
             const itemValues = values.getIn(schemaPath);
 
-            return map.set(key, transformFn(item, itemOptions, itemValues, schemaPath));
+            return map.set(key, transformFn(schemaItem, itemOptions, itemValues, schemaPath));
         }, <IMap>initial);
     }
 }
