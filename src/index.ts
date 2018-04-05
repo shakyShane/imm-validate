@@ -16,19 +16,21 @@ export function getTransformer(options: IMap, values: IMap, visitor: Function) {
             const valuePath = schemaPath;
 
             if (List.isList(schemaItem)) {
-                return map.set(key, schemaItem.map((item: any, index: number) => {
-                    if (Map.isMap(item)) {
-                        return validateFields(item, fromJS({}), lookup.concat('fields', index))
-                    } else {
-                        console.log('ere');
+                return map.set(key, schemaItem.map((schemaListItem: any, index: number) => {
+                    if (Map.isMap(schemaListItem)) {
+                        return validateFields(schemaListItem, fromJS({}), lookup.concat('fields', index))
                     }
-                }))
+                    if (typeof schemaListItem === 'string') {
+                        const thisOpts = options.getIn(lookup.concat('fields', index));
+                        const thisValues = values.getIn(lookup.concat('fields', index).filter(x => x!== 'fields'));
+                        return visitor(schemaListItem, thisOpts, thisValues, schemaPath.concat(index))
+                    }
+                }));
             }
 
             if (Map.isMap(schemaItem)) {
                 return map.set(key, validateFields(schemaItem, fromJS({}), lookup.concat('fields')));
             }
-
 
             const itemOptions = options.getIn(lookup, emptyMap);
             const itemValues = values.getIn(valuePath);

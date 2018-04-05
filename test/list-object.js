@@ -1,11 +1,14 @@
-const {validate, blank} = require('../dist');
-const {equal, deepEqual} = require('assert');
+const {validate} = require('../dist');
+const {equal} = require('assert');
 
 it('can validate a list of objects', function() {
     const schema = {
         width: "string",
         height: "string",
         doors: [{
+            length: "string",
+            color: "string"
+        }, {
             length: "string",
             color: "string"
         }]
@@ -36,6 +39,5 @@ it('can validate a list of objects', function() {
     };
 
     const result = (validate(schema, options, values));
-    console.log(result.errors[0]);
-    // equal(result.errors.length, 2);
+    equal(result.errors.length, 2);
 });
